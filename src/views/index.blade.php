@@ -30,11 +30,6 @@ header("Access-Control-Allow-Headers: X-Requested-With");
 
         <script src='vendor/swaggervel/lib/swagger-oauth.js' type='text/javascript'></script>
 
-        <!-- Some basic translations -->
-        <!-- <script src='lang/translator.js' type='text/javascript'></script> -->
-        <!-- <script src='lang/ru.js' type='text/javascript'></script> -->
-        <!-- <script src='lang/en.js' type='text/javascript'></script> -->
-
         <script type="text/javascript">
 
             function log() {
@@ -62,11 +57,7 @@ header("Access-Control-Allow-Headers: X-Requested-With");
                     onComplete: function (swaggerApi, swaggerUi) {
 
                         log("Loaded SwaggerUI");
-                        @if (isset($requestHeaders))
-                        @foreach($requestHeaders as $requestKey => $requestValue)
-                        window.authorizations.add("{!!$requestKey!!}", new ApiKeyAuthorization("{!!$requestKey!!}", "{!!$requestValue!!}", "header"));
-                        @endforeach
-                        @endif
+
 
                         if (typeof initOAuth == "function") {
                             initOAuth({
@@ -101,12 +92,6 @@ header("Access-Control-Allow-Headers: X-Requested-With");
                 });
 
                 function addApiKeyAuthorization() {
-                    var key = encodeURIComponent($('#input_apiKey')[0].value);
-                    if (key && key.trim() != "") {
-                        var apiKeyAuth = new SwaggerClient.ApiKeyAuthorization("api_key", key, "query");
-                        window.swaggerUi.api.clientAuthorizations.add("api_key", apiKeyAuth);
-                        log("added key " + key);
-                    }
                 }
 
                 $('#input_apiKey').change(addApiKeyAuthorization);
@@ -118,7 +103,7 @@ header("Access-Control-Allow-Headers: X-Requested-With");
                                 clientSecret: $('#input_clientSecret').val()||"_",
                                 realm: $('#input_realm').val()||"_",
                                 appName: $('#input_appName').val()||"_",
-                                scopeSeparator: ","
+                                scopeSeparator: "+"
                             });
                         }
                 });
@@ -126,6 +111,18 @@ header("Access-Control-Allow-Headers: X-Requested-With");
                 window.swaggerUi.load();
 
             });
+
+            function setAPIKey(el){
+                if(!el)
+                    return;
+
+                var value = el.value;
+
+                if(value.length == 40 ){
+                    var apiKeyAuth = new SwaggerClient.ApiKeyAuthorization("Authorization", value, "header");
+                    window.swaggerUi.api.clientAuthorizations.add("Authorization", apiKeyAuth);
+                }
+            }
         </script>
     </head>
 
@@ -134,7 +131,7 @@ header("Access-Control-Allow-Headers: X-Requested-With");
             <div class="swagger-ui-wrap">
                 <a id="logo" href="http://swagger.io">swagger</a>
                 <form id='api_selector'>
-                    <div class='input'><input placeholder="api_key" id="input_apiKey" name="apiKey" type="text"/></div>
+                    <div class='input'><input onkeyup="setAPIKey(this)" placeholder="Token" id="inputapiKey" name="apiKey" type="text"/></div>
                 </form>
             </div>
         </div>
