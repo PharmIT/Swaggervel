@@ -134,22 +134,9 @@ header("Access-Control-Allow-Headers: X-Requested-With");
             <div class="swagger-ui-wrap">
                 <a id="logo" href="http://swagger.io">swagger</a>
                 <form id='api_selector'>
-                    <div class='input'><input placeholder="http://example.com/api" id="input_baseUrl" name="baseUrl" type="text"/></div>
                     <div class='input'><input placeholder="api_key" id="input_apiKey" name="apiKey" type="text"/></div>
-                    <div class='input'><a id="explore" href="#" data-sw-translate>Explore</a></div>
                 </form>
             </div>
-        </div>
-
-        <div id="oauth2-settings" class="swagger-ui-wrap">
-            <h2>OAuth2 settings</h2>
-            <input placeholder="Client Id" id="input_clientId" name="clientId" type="text" value="{!! $clientId !!}"/>
-            <input placeholder="Client Secret" id="input_clientSecret" name="clientSecret" type="text" value="{!! $clientSecret !!}"/>
-            <input placeholder="Realm" id="input_realm" name="realm" type="text" value="{!! $realm !!}"/>
-            <input placeholder="App Name" id="input_appName" name="appName" type="text" value="{!! $appName !!}"/>
-            <button id="init-oauth" href="#" data-sw-translate value="">Init OAuth</button>
-            <br/>
-            <span class="note">Configure OAuth2 Client with id="<span id="clientId"></span>" and redirect url="<span id="redirectUrl"></span>"</span>
         </div>
 
         <div id="message-bar" class="swagger-ui-wrap" data-sw-translate>&nbsp;</div>
