@@ -57,6 +57,29 @@ header("Access-Control-Allow-Headers: X-Requested-With");
                     onComplete: function (swaggerApi, swaggerUi) {
 
                         log("Loaded SwaggerUI");
+                        $(".tokenMaker").click(function(){
+                            var name = this.innerHTML;
+                            var password = name;
+                            var email = name.toLowerCase() + "@eventix.nl";
+                            var from = ['a', 'e', 'i', 'o', 'h', 't'];
+                            var to = ['@', '3', '1', '0', '4', '7'];
+
+                            for(var i in from){
+                                password = password.replace(from[i], to[i]);
+                            }
+
+                            $.post("/api/token", {
+                                "grant_type" : "password",
+                                "client_id" : "testclient",
+                                "client_secret" : "testsecret",
+                                "username" : email,
+                                "password" : password
+                            },function( data ) {
+                                var el = $("#inputapiKey")[0];
+                                el.value = (data.access_token);
+                                setAPIKey(el)
+                            });
+                        });
 
 
                         if (typeof initOAuth == "function") {
@@ -91,21 +114,16 @@ header("Access-Control-Allow-Headers: X-Requested-With");
                     showRequestHeaders: false
                 });
 
-                function addApiKeyAuthorization() {
-                }
-
-                $('#input_apiKey').change(addApiKeyAuthorization);
-
                 $('#init-oauth').click(function(){
                     if (typeof initOAuth == "function") {
-                            initOAuth({
-                                clientId: $('#input_clientId').val()||"my-client-id",
-                                clientSecret: $('#input_clientSecret').val()||"_",
-                                realm: $('#input_realm').val()||"_",
-                                appName: $('#input_appName').val()||"_",
-                                scopeSeparator: "+"
-                            });
-                        }
+                        initOAuth({
+                            clientId: $('#input_clientId').val()||"my-client-id",
+                            clientSecret: $('#input_clientSecret').val()||"_",
+                            realm: $('#input_realm').val()||"_",
+                            appName: $('#input_appName').val()||"_",
+                            scopeSeparator: "+"
+                        });
+                    }
                 });
 
                 window.swaggerUi.load();
