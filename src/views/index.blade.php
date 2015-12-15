@@ -9,9 +9,7 @@ header("Access-Control-Allow-Headers: X-Requested-With");
 <html>
 <head>
     <meta charset="UTF-8">
-    <title>Swagger UI</title>
-    <link rel="icon" type="image/png" href="vendor/swaggervel/images/favicon-32x32.png" sizes="32x32"/>
-    <link rel="icon" type="image/png" href="vendor/swaggervel/images/favicon-16x16.png" sizes="16x16"/>
+    <title>Eventix API Docs</title>
     <link href='vendor/swaggervel/css/typography.css' media='screen' rel='stylesheet' type='text/css'/>
     <link href='vendor/swaggervel/css/reset.css' media='screen' rel='stylesheet' type='text/css'/>
     <link href='vendor/swaggervel/css/screen.css' media='screen' rel='stylesheet' type='text/css'/>
@@ -31,6 +29,9 @@ header("Access-Control-Allow-Headers: X-Requested-With");
     <script src='vendor/swaggervel/lib/swagger-oauth.js' type='text/javascript'></script>
 
     <script type="text/javascript">
+
+        var clientId = false;
+        var clientSecret = false;
 
         function log() {
             if ('console' in window) {
@@ -57,7 +58,50 @@ header("Access-Control-Allow-Headers: X-Requested-With");
                 onComplete: function (swaggerApi, swaggerUi) {
 
                     log("Loaded SwaggerUI");
-                    $(".tokenMaker").click(function () {
+
+                    $.get("/api/client").done(function (data) {
+                        var buttonHTML = "";
+                        var selectHTML = "";
+
+                        while(data.length){
+                            var d = data.pop();
+
+                            buttonHTML += "<div style='margin: 5px;'><button class='justClient'>"+ d.name + "</button></div>";
+                            selectHTML += "<option>"+ d.name + "</option>";
+                        }
+
+                        document.getElementById("clientSelect").innerHTML += selectHTML;
+                        document.getElementById("clientButtons").innerHTML = buttonHTML;
+
+                    }).fail(function (data) {
+                        console.log(data);
+                        window.alert("Failed loading clients")
+                    });
+
+                    $.get("/api/userList").done(function (data) {
+                        var buttonHTML = "";
+                        while(data.length){
+                            var d = data.pop();
+
+                            var name = d.name.split(" ")[0];
+                            buttonHTML += "<div style='margin: 5px;'><button class='tokenMaker' disabled>"+ name + "</button></div>";
+
+                        }
+
+                        document.getElementById("userList").innerHTML = buttonHTML;
+
+                    }).fail(function (data) {
+                        console.log(data);
+                        window.alert("Failed loading users")
+                    });
+
+
+                    $("#userList").on('click', '.tokenMaker', function () {
+                        if (clientId === false || clientSecret === false) {
+                            window.alert("Please select a client first.");
+                            return;
+                        }
+
                         var name = this.innerHTML;
                         var password = name;
                         var email = name.toLowerCase() + "@eventix.nl";
@@ -70,61 +114,70 @@ header("Access-Control-Allow-Headers: X-Requested-With");
 
                         $.post("/api/token", {
                             "grant_type": "password",
-                            "client_id": "testclient",
-                            "client_secret": "testsecret",
+                            "client_id": clientId,
+                            "client_secret": clientSecret,
                             "username": email,
                             "password": password
                         }, function (data) {
                             var el = $("#inputapiKey")[0];
                             el.value = (data.access_token);
+
+                            document.getElementById("typeHelper").innerHTML = " - Logged in as <u>User</u>";
+
                             setAPIKey(el)
                         }).fail(function (data) {
                             window.alert('Could not log on as user: ' + name);
                         });
                     });
-
-                    $(".clientMaker").click(function () {
-
+                    $("#clientButtons").on('click', 'button', function () {
                         var client = this.innerHTML;
-                        console.log(client);
                         $.get("/api/client/" + client, function (data) {
                             if (!data.id && !data.secret) {
-                                window.alert('Could not log on as client: ' + client);
+                                window.alert('Could not authenticate client: ' + client);
                                 return;
                             }
 
-                            var client = data.id;
-                            var secret = data.secret;
-
                             $.post("/api/token", {
                                 "grant_type": "client_credentials",
-                                "client_id": client,
-                                "client_secret": secret,
+                                "client_id": data.id,
+                                "client_secret": data.secret,
                             }, function (data) {
                                 var el = $("#inputapiKey")[0];
                                 el.value = (data.access_token);
+                                console.log(document.getElementById("header"));
+                                document.getElementById("typeHelper").innerHTML = " - Logged in as <u>Client</u>";
+
                                 setAPIKey(el)
                             });
                         }).fail(function (data) {
-                            window.alert('Could not log on as client: ' + client);
+                            window.alert('Could not authenticate client: ' + client);
+                        });
+                    });
+
+                    $("#clientSelect").change(function () {
+                        $(".tokenMaker").each(function () {
+                            this.setAttribute('disabled', 1);
+                        });
+//                        return;
+                        var client = this.value;
+
+                        $.get("/api/client/" + client, function (data) {
+                            if (!data.id && !data.secret) {
+                                window.alert('Could not get client info for: ' + client);
+                                return;
+                            }
+
+                            clientId = data.id;
+                            clientSecret = data.secret;
+
+                            $(".tokenMaker").each(function () {
+                                this.removeAttribute('disabled');
+                            });
+                        }).fail(function (data) {
+                            window.alert('Could not get client info for: ' + client);
                         });
 
                     });
-
-
-                    if (typeof initOAuth == "function") {
-                        initOAuth({
-                            clientId: "{!! $clientId !!}" || "my-client-id",
-                            clientSecret: "{!! $clientSecret !!}" || "_",
-                            realm: "{!! $realm !!}" || "_",
-                            appName: "{!! $appName !!}" || "_",
-                            scopeSeparator: ","
-                        });
-
-                        window.oAuthRedirectUrl = "{{ url('vendor/swaggervel/o2c.html') }}";
-                        $('#clientId').html("{!! $clientId !!}" || "my-client-id");
-                        $('#redirectUrl').html(window.oAuthRedirectUrl);
-                    }
 
                     if (window.SwaggerTranslator) {
                         window.SwaggerTranslator.translate();
@@ -133,8 +186,6 @@ header("Access-Control-Allow-Headers: X-Requested-With");
                     $('pre code').each(function (i, e) {
                         hljs.highlightBlock(e)
                     });
-
-                    addApiKeyAuthorization();
                 },
                 onFailure: function (data) {
                     log("Unable to Load SwaggerUI");
@@ -175,9 +226,9 @@ header("Access-Control-Allow-Headers: X-Requested-With");
 </head>
 
 <body class="swagger-section">
-<div id='header'>
+<div id='header' style="position:fixed; left: 0px; right: 0px;">
     <div class="swagger-ui-wrap">
-        <a id="logo" href="http://swagger.io">swagger</a>
+        <a id="logo" href="//eventix.io">Eventix API Docs <span id="typeHelper"></span></a>
 
         <form id='api_selector'>
             <div class='input'><input onkeyup="setAPIKey(this)" placeholder="Token" id="inputapiKey" name="apiKey"
@@ -187,6 +238,6 @@ header("Access-Control-Allow-Headers: X-Requested-With");
 </div>
 
 <div id="message-bar" class="swagger-ui-wrap" data-sw-translate>&nbsp;</div>
-<div id="swagger-ui-container" class="swagger-ui-wrap"></div>
+<div id="swagger-ui-container" style="margin-top: 40px;" class="swagger-ui-wrap"></div>
 </body>
 </html>

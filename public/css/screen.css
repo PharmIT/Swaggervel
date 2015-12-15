@@ -1216,14 +1216,18 @@
   cursor: pointer;
 }
 .swagger-section #header {
-  background-color: #89bf04;
+  background-color: #3FA9F5;
+  position: fixed;
+  left: 0px;
+  right: 0px;
   padding: 14px;
 }
 .swagger-section #header a#logo {
   font-size: 1.5em;
   font-weight: bold;
   text-decoration: none;
-  background: transparent url(../images/logo_small.png) no-repeat left center;
+  background: transparent url(../images/eventixStroke.png) no-repeat left center;
+  background-size: 35px 35px;
   padding: 20px 0 20px 40px;
   color: white;
 }
