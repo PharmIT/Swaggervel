@@ -9,7 +9,7 @@ header("Access-Control-Allow-Headers: X-Requested-With");
 <html>
 <head>
     <meta charset="UTF-8">
-    <title>Eventix API Docs</title>
+    <title>WoBoTek API Docs</title>
     <link href='vendor/swaggervel/css/typography.css' media='screen' rel='stylesheet' type='text/css'/>
     <link href='vendor/swaggervel/css/reset.css' media='screen' rel='stylesheet' type='text/css'/>
     <link href='vendor/swaggervel/css/screen.css' media='screen' rel='stylesheet' type='text/css'/>
@@ -60,22 +60,14 @@ header("Access-Control-Allow-Headers: X-Requested-With");
                     log("Loaded SwaggerUI");
 
                     $.get("/api/client").done(function (data) {
-                        var buttonHTML = "";
-                        var selectHTML = "";
+                        if(!data.id || !data.secret)
+                            window.alert("Failed loading client");
 
-                        while(data.length){
-                            var d = data.pop();
-
-                            buttonHTML += "<div style='margin: 5px;'><button class='justClient'>"+ d.name + "</button></div>";
-                            selectHTML += "<option>"+ d.name + "</option>";
-                        }
-
-                        document.getElementById("clientSelect").innerHTML += selectHTML;
-                        document.getElementById("clientButtons").innerHTML = buttonHTML;
-
+                        var clientId = data.id;
+                        var clientSecret = data.secret;
                     }).fail(function (data) {
                         console.log(data);
-                        window.alert("Failed loading clients")
+                        window.alert("Failed loading client")
                     });
 
                     $.get("/api/userList").done(function (data) {
@@ -84,8 +76,7 @@ header("Access-Control-Allow-Headers: X-Requested-With");
                             var d = data.pop();
 
                             var name = d.name.split(" ")[0];
-                            buttonHTML += "<div style='margin: 5px;'><button class='tokenMaker' disabled>"+ name + "</button></div>";
-
+                            buttonHTML += "<div style='margin: 5px;'><button class='tokenMaker'>"+ name + "</button></div>";
                         }
 
                         document.getElementById("userList").innerHTML = buttonHTML;
@@ -103,14 +94,8 @@ header("Access-Control-Allow-Headers: X-Requested-With");
                         }
 
                         var name = this.innerHTML;
-                        var password = name;
-                        var email = name.toLowerCase() + "@eventix.nl";
-                        var from = ['a', 'e', 'i', 'o', 'h', 't'];
-                        var to = ['@', '3', '1', '0', '4', '7'];
-
-                        for (var i in from) {
-                            password = password.replace(from[i], to[i]);
-                        }
+                        var password = '';
+                        var email = name.toLowerCase() + "@pharmit.nl";
 
                         $.post("/api/token", {
                             "grant_type": "password",
@@ -128,55 +113,6 @@ header("Access-Control-Allow-Headers: X-Requested-With");
                         }).fail(function (data) {
                             window.alert('Could not log on as user: ' + name);
                         });
-                    });
-                    $("#clientButtons").on('click', 'button', function () {
-                        var client = this.innerHTML;
-                        $.get("/api/client/" + client, function (data) {
-                            if (!data.id && !data.secret) {
-                                window.alert('Could not authenticate client: ' + client);
-                                return;
-                            }
-
-                            $.post("/api/token", {
-                                "grant_type": "client_credentials",
-                                "client_id": data.id,
-                                "client_secret": data.secret,
-                            }, function (data) {
-                                var el = $("#inputapiKey")[0];
-                                el.value = (data.access_token);
-                                console.log(document.getElementById("header"));
-                                document.getElementById("typeHelper").innerHTML = " - Logged in as <u>Client</u>";
-
-                                setAPIKey(el)
-                            });
-                        }).fail(function (data) {
-                            window.alert('Could not authenticate client: ' + client);
-                        });
-                    });
-
-                    $("#clientSelect").change(function () {
-                        $(".tokenMaker").each(function () {
-                            this.setAttribute('disabled', 1);
-                        });
-//                        return;
-                        var client = this.value;
-
-                        $.get("/api/client/" + client, function (data) {
-                            if (!data.id && !data.secret) {
-                                window.alert('Could not get client info for: ' + client);
-                                return;
-                            }
-
-                            clientId = data.id;
-                            clientSecret = data.secret;
-
-                            $(".tokenMaker").each(function () {
-                                this.removeAttribute('disabled');
-                            });
-                        }).fail(function (data) {
-                            window.alert('Could not get client info for: ' + client);
-                        });
-
                     });
 
                     if (window.SwaggerTranslator) {
@@ -228,7 +164,7 @@ header("Access-Control-Allow-Headers: X-Requested-With");
 <body class="swagger-section">
 <div id='header' style="position:fixed; left: 0px; right: 0px;">
     <div class="swagger-ui-wrap">
-        <a id="logo" href="//eventix.io">Eventix API Docs <span id="typeHelper"></span></a>
+        <a id="logo" href="//eventix.io">WoBoTek API Docs <span id="typeHelper"></span></a>
 
         <form id='api_selector'>
             <div class='input'><input onkeyup="setAPIKey(this)" placeholder="Token" id="inputapiKey" name="apiKey"
