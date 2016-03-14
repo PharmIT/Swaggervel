@@ -63,8 +63,8 @@ header("Access-Control-Allow-Headers: X-Requested-With");
                         if(!data.id || !data.secret)
                             window.alert("Failed loading client");
 
-                        var clientId = data.id;
-                        var clientSecret = data.secret;
+                        clientId = data.id;
+                        clientSecret = data.secret;
                     }).fail(function (data) {
                         console.log(data);
                         window.alert("Failed loading client")
