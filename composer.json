@@ -1,8 +1,8 @@
 {
-    "name": "jlapp/swaggervel",
+    "name": "pharmit/swaggervel",
     "description": "A great way to integrate Swagger into Laravel",
     "keywords": ["laravel", "swagger", "l4", "l5", "documentation", "api"],
-    "version": "5.0.0",
+    "version": "1.0.0",
     "license": "MIT",
     "authors": [
         {
@@ -16,7 +16,7 @@
     },
     "autoload": {
         "psr-0": {
-            "Jlapp\\Swaggervel": "src/"
+            "PharmIT\\Swaggervel": "src/"
         }
     },
     "minimum-stability": "stable"

@@ -59,6 +59,16 @@ header("Access-Control-Allow-Headers: X-Requested-With");
 
                     log("Loaded SwaggerUI");
 
+                    $.get( "client", function( data ) {
+                      var options;
+
+                      while(data.length) {
+                        var d = data.pop();
+                        options += '<option client_id="'+d.id+'" client_secret="'+d.secret+'">'+d.name+'</option>';
+                      }
+                      document.getElementById('clientSelect').innerHTML += options;
+                    });
+
                     $("#userList").on('click', '.tokenMaker', function () {
                         if (clientId === false || clientSecret === false) {
                             window.alert("Please select a client first.");
@@ -103,6 +113,47 @@ header("Access-Control-Allow-Headers: X-Requested-With");
                 showRequestHeaders: false
             });
 
+            $('#clientButton').click(function () {
+              var client_id = $( "#clientSelect option:selected" ).attr('client_id');
+              var client_secret = $( "#clientSelect option:selected" ).attr('client_secret');
+
+              if(client_id == null || client_secret == null) {
+                window.alert("Please select a client.");
+                return;
+              }
+
+              $.post( "oauth/client", { grant_type: 'client_credentials', client_id: client_id, client_secret: client_secret}, function( data ) {
+                var apiKeyAuth = new SwaggerClient.ApiKeyAuthorization("Authorization", data.access_token, "header");
+                window.swaggerUi.api.clientAuthorizations.add("Authorization", apiKeyAuth);
+                $('#inputapiKey').val(data.access_token);
+              });
+            });
+
+            $('#credentialsButton').click(function () {
+              var credentials_username = '{{ env('CREDENTIALS_USERNAME', 'blank')}}';
+              var credentials_password = '{{ env('CREDENTIALS_PASSWORD', 'blank')}}';
+
+              if(credentials_username == 'blank' || credentials_password == 'blank') {
+                window.alert("There are no credentials defined in the environment.");
+                return;
+              }
+
+              var client_id = $( "#clientSelect option:selected" ).attr('client_id');
+              var client_secret = $( "#clientSelect option:selected" ).attr('client_secret');
+
+              if(client_id == null || client_secret == null) {
+                window.alert("Please select a client.");
+                return;
+              }
+
+              $.post( "oauth/credentials", { grant_type: 'password', client_id: client_id, client_secret: client_secret, username: credentials_username, password: credentials_password, scopes: 'createAccount'}, function( data ) {
+                var apiKeyAuth = new SwaggerClient.ApiKeyAuthorization("Authorization", data.access_token, "header");
+                window.swaggerUi.api.clientAuthorizations.add("Authorization", apiKeyAuth);
+                $('#inputapiKey').val(data.access_token);
+              });
+            });
+
+
             $('#init-oauth').click(function () {
                 if (typeof initOAuth == "function") {
                     initOAuth({
@@ -136,7 +187,7 @@ header("Access-Control-Allow-Headers: X-Requested-With");
 <body class="swagger-section">
 <div id='header' style="position:fixed; left: 0px; right: 0px;">
     <div class="swagger-ui-wrap">
-        <a id="logo" href="//medapp.nu">MedApp API Docs<span id="typeHelper"></span></a>
+        <a id="logo" href="//pharmit.nl"><span id="typeHelper"></span></a>
 
         <form id='api_selector'>
             <div class='input'><input onkeyup="setAPIKey(this)" placeholder="Token" id="inputapiKey" name="apiKey"
@@ -146,6 +197,13 @@ header("Access-Control-Allow-Headers: X-Requested-With");
 </div>
 
 <div id="message-bar" class="swagger-ui-wrap" data-sw-translate>&nbsp;</div>
+<div class="swagger-ui-wrap" style="margin-top: 50px">
+  <h1>Authentication</h1>
+  1. <select id="clientSelect" style="margin-top: 15px"><option selected="" disabled="">-- select --</option></select><br><br>
+  2. <button id="clientButton">Client auth</button> or
+  <button id="credentialsButton">User auth</button>
+  <div class="results"></div>
+</div>
 <div id="swagger-ui-container" style="margin-top: 40px;" class="swagger-ui-wrap"></div>
 </body>
 </html>

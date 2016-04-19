@@ -1216,7 +1216,7 @@
   cursor: pointer;
 }
 .swagger-section #header {
-  background-color: #1c8c94;
+  background-color: #E0E0E0;
   position: fixed;
   left: 0px;
   right: 0px;
@@ -1226,9 +1226,10 @@
   font-size: 1.5em;
   font-weight: bold;
   text-decoration: none;
-  background: transparent url(../images/medapplogo.png) no-repeat left center;
-  background-size: 35px 35px;
+  background: transparent url(../images/pharmitlogo.png) no-repeat left center;
+  background-size: 100px 35px;
   padding: 20px 0 20px 40px;
+  padding-left: 100px;
   color: white;
 }
 .swagger-section #header form#api_selector {
