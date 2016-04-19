@@ -42,7 +42,8 @@ When you run your app in debug mode, Swaggervel will scan your app folder (or an
 Installation
 ============
 
-- Add `Jlapp\Swaggervel\SwaggervelServiceProvider` to your providers array in `app/config/app.php` above your route provider, to avoid any catch-all routes
+- Require `"pharmit/swaggervel": "dev-master"` in your composer.json.
+- Add `PharmIT\Swaggervel\SwaggervelServiceProvider` to your providers array in `app/config/app.php` above your route provider, to avoid any catch-all routes.
 - Run `php artisan vendor:publish` to push swagger-ui to your public folder.
 - Add `CREDENTIALS_USERNAME=YOUR_USERNAME` and `CREDENTIALS_PASSWORD=YOUR_PASSWORD` to your `.env` file.
 
