@@ -1,4 +1,4 @@
-<?php namespace Jlapp\Swaggervel;
+<?php namespace PharmIT\Swaggervel;
 
 use Illuminate\Support\ServiceProvider;
 
