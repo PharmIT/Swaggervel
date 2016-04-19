@@ -59,34 +59,6 @@ header("Access-Control-Allow-Headers: X-Requested-With");
 
                     log("Loaded SwaggerUI");
 
-                    $.get("/api/client").done(function (data) {
-                        if(!data.id || !data.secret)
-                            window.alert("Failed loading client");
-
-                        clientId = data.id;
-                        clientSecret = data.secret;
-                    }).fail(function (data) {
-                        console.log(data);
-                        window.alert("Failed loading client")
-                    });
-
-                    $.get("/api/userList").done(function (data) {
-                        var buttonHTML = "";
-                        while(data.length){
-                            var d = data.pop();
-
-                            var name = d.name.split(" ")[0];
-                            buttonHTML += "<div style='margin: 5px;'><button class='tokenMaker'>"+ name + "</button></div>";
-                        }
-
-                        document.getElementById("userList").innerHTML = buttonHTML;
-
-                    }).fail(function (data) {
-                        console.log(data);
-                        window.alert("Failed loading users")
-                    });
-
-
                     $("#userList").on('click', '.tokenMaker', function () {
                         if (clientId === false || clientSecret === false) {
                             window.alert("Please select a client first.");
