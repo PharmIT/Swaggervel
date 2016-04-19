@@ -136,7 +136,7 @@ header("Access-Control-Allow-Headers: X-Requested-With");
 <body class="swagger-section">
 <div id='header' style="position:fixed; left: 0px; right: 0px;">
     <div class="swagger-ui-wrap">
-        <a id="logo" href="//eventix.io">WoBoTek API Docs <span id="typeHelper"></span></a>
+        <a id="logo" href="//medapp.nu">MedApp API Docs<span id="typeHelper"></span></a>
 
         <form id='api_selector'>
             <div class='input'><input onkeyup="setAPIKey(this)" placeholder="Token" id="inputapiKey" name="apiKey"
