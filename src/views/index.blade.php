@@ -9,7 +9,7 @@ header("Access-Control-Allow-Headers: X-Requested-With");
 <html>
 <head>
     <meta charset="UTF-8">
-    <title>WoBoTek API Docs</title>
+    <title>PharmIT API Docs</title>
     <link href='vendor/swaggervel/css/typography.css' media='screen' rel='stylesheet' type='text/css'/>
     <link href='vendor/swaggervel/css/reset.css' media='screen' rel='stylesheet' type='text/css'/>
     <link href='vendor/swaggervel/css/screen.css' media='screen' rel='stylesheet' type='text/css'/>
